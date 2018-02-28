@@ -4,7 +4,7 @@ Repository for the [OBIS Event Data Workshop on animal tagging and tracking data
 
 
 ## List of applications, services
-- identifying priority sites for conservation 
+- Identifying priority sites for conservation 
 
 ## List of science questions, knowledge challenges
 - Insights into Pelagic Migrations: Implications for Ecology and Conservation
