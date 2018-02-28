@@ -4,7 +4,16 @@ Repository for the [OBIS Event Data Workshop on animal tagging and tracking data
 
 
 ## List of applications, services
+- identifying priority sites for conservation 
+
 ## List of science questions, knowledge challenges
+- Insights into Pelagic Migrations: Implications for Ecology and Conservation
+- When is a marine protected area network ecologically coherent?
+- The importance of understanding migratory connectivity and seasonal interactions
+
 
 Do the data products work for the application (evaluation)?
+
+
+
 
