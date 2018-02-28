@@ -2,4 +2,4 @@
 
 - [Sequeira et al. (2018) Convergence of marine megafauna movement patterns in coastal and open oceans](Sequeira_etal_PNAS_2018.pdf)
 - [Costa et al. (2016) Assessing the exposure of animals to acoustic disturbance: Towards an
-understanding of the population consequences of disturbance](Costa-POMA_2016-Assessing the exposure of animals t.pdf)
+understanding of the population consequences of disturbance](Costa-POMA_2016-Assessing%20the%20exposure%20of%20animals%20t.pdf)
