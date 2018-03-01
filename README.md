@@ -11,6 +11,7 @@ Repository for the [OBIS Event Data Workshop on animal tagging and tracking data
 - Insights into Pelagic Migrations: Implications for Ecology and Conservation
 - When is a marine protected area network ecologically coherent?
 - The importance of understanding migratory connectivity and seasonal interactions
+- Overlap migrating species (e.g. grazers) with particular habitats (e.g. seagrass meadows)
 
 
 Do the data products work for the application (evaluation)?
