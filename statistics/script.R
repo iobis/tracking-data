@@ -44,3 +44,8 @@ ggsave("barplot.png", width = 12, height = 8)
 
 species <- occ %>% group_by(species) %>% summarize(records = n(), datasets = length(unique(resourceID))) %>% arrange(desc(records))
 write.csv(species, file = "species.csv", row.names = FALSE)
+
+# node stats
+
+nodes <- occ %>% group_by(node_name) %>% summarize(records = n(), datasets = length(unique(resourceID))) %>% arrange(desc(records))
+write.csv(nodes, file = "nodes.csv", row.names = FALSE)
