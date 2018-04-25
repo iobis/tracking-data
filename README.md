@@ -2,6 +2,7 @@
 
 Repository for the [OBIS Event Data Workshop on animal tagging and tracking data](https://www.iode.org/index.php?option=com_oe&task=viewEventRecord&eventID=2144), 23-26 April 2018, Oostende, Belgium.
 
+Google Doc: https://docs.google.com/document/d/1W6Q-KLwjM2dnI_VeQuKUmz-qOp50BDloVfjjakkax48/edit
 
 ## List of applications, services
 - Identifying priority sites for conservation (foraging and breeding areas, important habitats, migrating corridors)
