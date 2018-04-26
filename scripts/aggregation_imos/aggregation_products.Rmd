@@ -5,18 +5,19 @@ output: html_notebook
 
 
 ```{r}
-source('Animal Tracking Toolbox_V6.R')
+source('../aggregation/tracking toolbox/Animal Tracking Toolbox_V6.R')
 library(raster)
 library(dplyr)
 library(lubridate)
 library(sf)
+library(ggplot2)
 ```
 
-1) Load data
+# 1) Load data
 
 ```{r, include=FALSE, echo=FALSE}
-# accoustic_file <- readr::read_tsv('/Users/samuel/Downloads/dwca-imos_atf_ad-v1.2/occurrence.txt')
-# readr::write_tsv(accoustic_file[1:50000,], 'imos_atf_ad_sample.txt.gz')
+# acoustic_file <- readr::read_tsv('/Users/samuel/Downloads/dwca-imos_atf_ad-v1.2/occurrence.txt')
+# readr::write_tsv(acoustic_file[1:50000,], 'imos_atf_ad_sample.txt.gz')
 # 
 # sattelite_file <- readr::read_tsv('/Users/samuel/Downloads/dwca-imos_aatams-v1.3/occurrence.txt')
 # readr::write_tsv(sattelite_file[1:50000,], 'imos_aatams_sample.txt.gz')
@@ -37,7 +38,7 @@ imos_satellite <- readr::read_tsv('imos_aatams_sample.txt.gz') %>%
 ```
 
 
-2) Bin by 1 km / 1 week
+# 2) Bin by 1 km / 1 week
 
 ```{r}
 bin_tracking_data <- function(data) {
@@ -53,22 +54,41 @@ bin_tracking_data <- function(data) {
            weeks = lubridate::week(dates),
            years = lubridate::year(dates)) %>%
     group_by(cells, weeks, years, organismID) %>%
-    summarise(detections = sum(detections))
+    summarise(decimalLongitude=first(decimalLongitude),
+              decimalLatitude=first(decimalLatitude),
+              eventDate=first(eventDate),
+              detections = sum(detections)) %>% 
+    ungroup() %>%
+    select_(., .dots = colnames(data))
 }
 imos_acoustic_binned <- bin_tracking_data(imos_acoustic)
 imos_satellite_binned <- bin_tracking_data(imos_satellite)
 ```
 
-3) Explore binned VS original
+# 3) Explore binned VS original
 
-Maps acoustic
+Map acoustic
 
 ```{r}
+library(leaflet)
+map_original_binned <- function(original, binned) {
+  leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
+    addCircleMarkers(
+      radius = 3.5, weight = 0, fillColor = "#FF368B", fillOpacity = 1,
+      lat = original$decimalLatitude, lng = original$decimalLongitude) %>%
+    addCircleMarkers(
+      radius = 3.5, weight = 0, fillColor = "#0000CD", fillOpacity = 1,
+      lat = binned$decimalLatitude, lng = binned$decimalLongitude)
+}
+
 ggplot() +
   geom_sf(data = sf::st_as_sf(maps::map('world', plot = FALSE, fill = TRUE)), colour="gray80", fill="gray80") +
   geom_point(data = imos_acoustic, aes(x = decimalLongitude, y = decimalLatitude), size = 1, stroke = 0.5, alpha = 0.3, colour = "#FF368B") +
   geom_point(data = imos_acoustic_binned, aes(x = decimalLongitude, y = decimalLatitude), size = 1, stroke = 0.5, alpha = 0.3, colour = "#0000CD") +
   xlab("Longitude") +
-  ylab("Latitude") 
+  ylab("Latitude")
+
+
+
 ```
 
