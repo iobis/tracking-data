@@ -1,0 +1,67 @@
+---
+title: "Aggregation and products notebook"
+output: html_notebook
+---
+
+
+```{r}
+source('Animal Tracking Toolbox_V6.R')
+library(raster)
+library(dplyr)
+library(lubridate)
+```
+
+1) Load data
+
+```{r, include=FALSE, echo=FALSE}
+# accoustic_file <- readr::read_tsv('/Users/samuel/Downloads/dwca-imos_atf_ad-v1.2/occurrence.txt')
+# readr::write_tsv(accoustic_file[1:50000,], 'imos_atf_ad_sample.txt.gz')
+# 
+# sattelite_file <- readr::read_tsv('/Users/samuel/Downloads/dwca-imos_aatams-v1.3/occurrence.txt')
+# readr::write_tsv(sattelite_file[1:50000,], 'imos_aatams_sample.txt.gz')
+
+# acoustic_emof <- readr::read_csv('/Users/samuel/Downloads/dwca-imos_atf_ad-v1.2/extendedmeasurementorfact.txt')
+```
+
+```{r}
+xycols <- c('decimalLongitude', 'decimalLatitude')
+imos_acoustic <- readr::read_tsv('imos_atf_ad_sample.txt.gz') %>% 
+  select(decimalLongitude, decimalLatitude, 
+         detections = organismQuantity, eventDate,
+         organismID = eventID)
+imos_satellite <- readr::read_tsv('imos_aatams_sample.txt.gz') %>%
+  select(decimalLongitude, decimalLatitude,
+         detections = individualCount, eventDate,
+         organismID = fieldNumber)
+```
+
+
+2) Bin by 1 km / 1 week
+
+```{r}
+bin_tracking_data <- function(data) {
+  lonlat <- CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
+  equalarea <- CRS('+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0')
+  
+  grid <- raster(xmn=-17367530, xmx=17367530, ymn=-7342230, ymx=7342230, crs=equalarea, resolution=1000)
+  pts <- sf::sf_project(lonlat@projargs, equalarea@projargs, as.matrix(data[,xycols]))
+  cells <- cellFromXY(grid, pts)
+  dates <- lubridate::as_datetime(data$eventDate)
+  data %>% 
+    mutate(cells, 
+           weeks = lubridate::week(dates),
+           years = lubridate::year(dates)) %>%
+    group_by(cells, weeks, years, organismID) %>%
+    summarise(detections = sum(detections))
+}
+imos_acoustic_binned <- bin_tracking_data(imos_acoustic)
+imos_satellite_binned <- bin_tracking_data(imos_satellite)
+
+```
+
+3) Explore binned VS original
+
+```{r}
+
+```
+
