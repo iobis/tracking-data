@@ -5,13 +5,14 @@ output: html_notebook
 
 
 ```{r, include=FALSE}
-source('../aggregation/tracking toolbox/Animal Tracking Toolbox_V6.R')
 library(raster)
 library(dplyr)
 library(lubridate)
 library(sf)
 library(ggplot2)
 library(leaflet)
+library(adehabitatHR)
+library(sp)
 ```
 
 # 1) Load data
@@ -96,6 +97,72 @@ map_original_binned(imos_satellite, imos_satellite_binned)
 
 # 4) Generate products
 
+```{r}
+calc_mcp <- function(data, percent = 100) {
+  lonlat <- CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
+  xy <- data[,xycols]
+  coords <- sp::SpatialPoints(xy, lonlat)
+  
+  if(nrow(distinct(xy)) > 4) {
+    adehabitatHR::mcp(coords, percent = percent)
+  } else {
+    NULL
+  }
+}
+
+calc_all_mcp <- function(data) {
+  # todo split in different time periods (e.g. monthly mcp)
+  lapply(unique(data$organismID), function(id) calc_mcp(data %>% filter(organismID == id)))
+}
+
+acoustic_binned_mcp <- calc_all_mcp(imos_acoustic_binned)
+acoustic_mcp <- calc_all_mcp(imos_acoustic)
+satellite_binned_mcp <- calc_all_mcp(imos_satellite_binned)
+satellite_mcp <- calc_all_mcp(imos_satellite)
+```
+
+# Home-range
+
+```{r}
+# duplicate the data or add weights in some way
+calc_bbhomerange <- function(data) {
+  ### sig2:       Smoothing factor used for Brownian Bridge KUD (in m), related to imprecision of relocations [default= 200 m for acoustic receivers]
+  ### ext:        Extent metric used to define extent of grid for brownian bridge kud estimation [default= 2]
+  ### grid:       Grid resolution width for brownian bridge kud estimation [default= 200]
+  ### div:        Divisor for sig1 smoothing factor [default = 4]   
+  sig2=200
+  ext=2
+  grid=200
+  div=4
+  lonlat <- CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
+  equalarea <- CRS('+proj=cea +lon_0=0 +lat_ts=30 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0')
+  pts <- sf::sf_project(lonlat@projargs, equalarea@projargs, as.matrix(data[,xycols]))
+  dat <- sp::SpatialPointsDataFrame(pts, data, proj4string=equalarea)
+  
+  width <- ceiling(max((extent(dat)[2]-extent(dat)[1])/2,(extent(dat)[4]-extent(dat)[3])/2))
+  xcen <- mean(extent(dat)[1:2])
+  ycen <- mean(extent(dat)[3:4])
+  gr <- expand.grid(x=seq(xcen-(width*ext), xcen+(width*ext),len=grid),y=seq(ycen-(width*ext), ycen+(width*ext),len=grid))
+  coordinates(gr) <- ~x+y
+  gridded(gr) <- TRUE
+  
+  tf <- adehabitatLT::as.ltraj(xy=coordinates(dat), date=lubridate::as_datetime(dat$eventDate, tz="GMT"), id=dat$organismID, 
+                               typeII=TRUE, proj4string=equalarea)
+  s1f <- (liker(tf, rangesig1=c(0,500), sig2=sig2, byburst=FALSE, plotit=FALSE)[[1]]$sig1) / div
+  # tryCatch({
+  #   kbfull<-kernelbb(tf, sig1=s1f, sig2=sig2, grid=gr)
+  #   bf<-kernel.area(kbfull, percent=c(50,95), unin="m", unout="m2")
+  #   # full$bbk50<-bf[1]; full$bbk95<-bf[2]
+  #   },error=function(e){message("ERROR in calculating full BBKUD estimates and area:",conditionMessage(e))})
+  # kbfull
+  # dev.new(noRStudioGD=TRUE)
+  # plot(gr, col=NA)
+  # plot(raster(as(getvolumeUD(kbfull)[[1]],"SpatialPixelsDataFrame")), col=colorRampPalette(RColorBrewer::brewer.pal('Spectral', n=11))(400), zlim=c(0,100))
+  # tryCatch({plot(getverticeshr(kbfull, 95), border=1, lty=3, add=TRUE)},error=function(e){message("ERROR in plotting 95% overall BBKUD contour:",conditionMessage(e))})
+  # tryCatch({plot(getverticeshr(kbfull, 50), border=1, lty=1, add=TRUE)},error=function(e){message("ERROR in plotting 50% overall BBKUD contour:",conditionMessage(e))})
+  # points(dat, pch=20, cex=0.5, col="blue")
+}
+```
 
 
 
