@@ -4,13 +4,14 @@ output: html_notebook
 ---
 
 
-```{r}
+```{r, include=FALSE}
 source('../aggregation/tracking toolbox/Animal Tracking Toolbox_V6.R')
 library(raster)
 library(dplyr)
 library(lubridate)
 library(sf)
 library(ggplot2)
+library(leaflet)
 ```
 
 # 1) Load data
@@ -67,10 +68,7 @@ imos_satellite_binned <- bin_tracking_data(imos_satellite)
 
 # 3) Explore binned VS original
 
-Map acoustic
-
 ```{r}
-library(leaflet)
 map_original_binned <- function(original, binned) {
   leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
     addCircleMarkers(
@@ -80,15 +78,24 @@ map_original_binned <- function(original, binned) {
       radius = 3.5, weight = 0, fillColor = "#0000CD", fillOpacity = 1,
       lat = binned$decimalLatitude, lng = binned$decimalLongitude)
 }
-
-ggplot() +
-  geom_sf(data = sf::st_as_sf(maps::map('world', plot = FALSE, fill = TRUE)), colour="gray80", fill="gray80") +
-  geom_point(data = imos_acoustic, aes(x = decimalLongitude, y = decimalLatitude), size = 1, stroke = 0.5, alpha = 0.3, colour = "#FF368B") +
-  geom_point(data = imos_acoustic_binned, aes(x = decimalLongitude, y = decimalLatitude), size = 1, stroke = 0.5, alpha = 0.3, colour = "#0000CD") +
-  xlab("Longitude") +
-  ylab("Latitude")
-
-
-
 ```
+
+### Map acoustic
+
+```{r}
+map_original_binned(imos_acoustic, imos_acoustic_binned)
+```
+
+
+### Map satellite
+
+```{r}
+map_original_binned(imos_satellite, imos_satellite_binned)
+```
+
+
+# 4) Generate products
+
+
+
 
