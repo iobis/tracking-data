@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: If you use this work, please cite it as below.
+title: Tracking Data
+type: dataset
+abstract: OBIS Event Data Workshop on animal tagging
+url: https://github.com/iobis/tracking-data
+license: CC-BY-IGO-4.0
+authors:
+  - given-names: Ward
+    family-names: Appeltans
+    orcid: "https://orcid.org/0000-0002-3237-4547"
+  - given-names: Pieter
+    family-names: Provoost
+    orcid: "https://orcid.org/0000-0002-4236-0384"
+  - given-names: Samuel
+    family-names: Bosch
+  - given-names: Jon
+    family-names: Pye
+  - given-names: Peggy
+    family-names: Newman
+  - given-names: Peter
+    family-names: Desmet
+  - given-names: Xavier
+    family-names: Hoenner
+  - given-names: Connie
+    family-names: Kot
+  - given-names: Holger
+    family-names: Dettki
+  - family-names: PeggyNewman
+  - family-names: conniekot1
+  - given-names: Daphnis De
+    family-names: Pooter
+  - family-names: holgerdettki
+  - name: Intergovernmental Oceanographic Commission of UNESCO
+    alias: IOC-UNESCO
+    website: "https://obis.org"
+keywords:
+  - obis-training-workshop
+date-released: 2018-11-06
